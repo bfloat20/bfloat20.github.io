@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BF20 Specification</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; padding: 2rem; background-color: #f9f9f9; color: #333; }
+    h1, h2, h3 { color: #2c3e50; }
+    code { background: #ecf0f1; padding: 2px 4px; border-radius: 4px; }
+    pre { background: #ecf0f1; padding: 1rem; border-radius: 4px; overflow-x: auto; }
+    .section { margin-bottom: 3rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 0.75rem; border: 1px solid #ccc; text-align: left; }
+    th { background-color: #eee; }
+  </style>
+</head>
+<body>
+  <h1>BF20 Floating Point Format Specification</h1>
+
+  <div class="section">
+    <h2>Overview</h2>
+    <p><strong>BF20</strong> (Brain Float 20-bit) is a proposed floating point format designed to strike a balance between the compactness of BF16 and the precision of FP32. It uses 20 bits to represent a number, allowing for efficient memory use while preserving sufficient dynamic range and precision for many AI, graphics, signal processing, and embedded workloads.</p>
+  </div>
+
+  <div class="section">
+    <h2>Bit Layout</h2>
+    <p>BF20 consists of the following components:</p>
+    <ul>
+      <li><strong>1 bit</strong> sign</li>
+      <li><strong>8 bits</strong> exponent (biased with 127)</li>
+      <li><strong>11 bits</strong> mantissa (with implicit leading 1)</li>
+    </ul>
+    <p>This layout matches the exponent width of FP32, allowing easier interoperability, while reducing the mantissa bits compared to FP32 to save space.</p>
+  </div>
+
+  <div class="section">
+    <h2>Why BF20?</h2>
+    <ul>
+      <li>BF16's 7-bit exponent is sometimes insufficient for graphics and signal processing applications.</li>
+      <li>FP32 provides more precision than necessary in many ML and rendering workloads, leading to unnecessary memory and compute overhead.</li>
+      <li>BF20 offers a sweet spot: 8-bit exponent for dynamic range, and 11-bit mantissa for better-than-BF16 precision.</li>
+      <li>Can significantly reduce memory bandwidth and storage usage in large-scale distributed computation.</li>
+      <li>More parallelism: three BF20 values can be packed into a single 64-bit register.</li>
+      <li>Useful across a wide variety of domains—AI inference, graphics shaders, DSP algorithms, and power-efficient embedded computing.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Format Value Encoding</h2>
+    <p>Given a 20-bit BF20 word, the layout is:</p>
+    <pre>
+S |  EEEEEEEE  | MMMMMMMMMMM
+^    8 bits       11 bits
+    </pre>
+    <p>Where:</p>
+    <ul>
+      <li><code>S</code>: sign bit (0 for positive, 1 for negative)</li>
+      <li><code>E</code>: 8-bit exponent, biased by 127</li>
+      <li><code>M</code>: 11-bit fraction (mantissa), with implicit leading 1 if exponent &ne; 0</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Use Cases</h2>
+    <ul>
+      <li><strong>AI Inference:</strong> Improves performance and reduces memory usage over FP32, with higher fidelity than BF16.</li>
+      <li><strong>Graphics Shaders:</strong> Suitable for fragment/pixel shaders requiring wide dynamic range and moderate precision.</li>
+      <li><strong>Signal Processing:</strong> A better alternative to FP16 where precision is insufficient, but full FP32 is overkill.</li>
+      <li><strong>Embedded Systems:</strong> Provides better trade-offs in power-constrained environments with limited memory.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Conclusion</h2>
+    <p>BF20 offers a pragmatic middle-ground between BF16 and FP32. With minor hardware changes and software support, BF20 can save power, reduce memory footprint, and increase parallel throughput without compromising on quality where BF16 would fall short. This makes it an ideal candidate for adoption in both general-purpose and domain-specific processors, especially for graphics, AI, and edge computing workloads.</p>
+  </div>
+</body>
+</html>
